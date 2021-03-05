@@ -1,20 +1,10 @@
-<?php 
-    session_start();
-    // logout logic
-    if(isset($_GET['action']) and $_GET['action'] == 'logout'){
-        session_start();
-        unset($_SESSION['username']);
-        unset($_SESSION['password']);
-        unset($_SESSION['logged_in']);
-        header('location: login.php');
-    }
-?>
+
 <html lang = "en">
    <head>
       <title>Login</title>
    </head>
    <body>
-      <h2>Enter Username and Password</h2> 
+      <h2>Enter valid username and password</h2> 
       <div>
          <?php
             $msg = '';
@@ -28,8 +18,7 @@
                   $_SESSION['logged_in'] = true;
                   $_SESSION['timeout'] = time();
                   $_SESSION['username'] = 'SunshinePro';
-                  echo 'You have entered valid use name and password';
-               } else {
+                  } else {
                   $msg = 'Wrong username or password';
                }
             }
@@ -38,8 +27,8 @@
       <div>
         <?php 
             if($_SESSION['logged_in'] == true){
-               print('<h1>You can only see this if you are logged in!</h1>');
-            }
+               header('location: index.php');}
+                         
         ?>
         <form action="" method="post">
             <h4><?php echo $msg; ?></h4>
