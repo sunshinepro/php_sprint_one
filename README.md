@@ -10,3 +10,13 @@ THIS file reader:
 4. allows upload files
 5. scans directories deeper untill files
 6. goes back directory tree
+
+Code logic:
+
+    <!-- 1. nustatom dabartines direktorijos adresa
+    2. Atsisiunciam direktorijos duomenis su GET ir patikrinam ar jie uzsetinti
+    3. Nuskenuojam direktorija i stringa 
+    4. patikrinam kiekviena stringo nari ar tai file ar directory
+    5. irasom duomenis i lentele
+    6. kuriam delete mygtuka lenteleje
+    7. kuriam back mygtuka aplikacijoje -->
