@@ -6,6 +6,7 @@ PHP file reader code as a first task of learning the PHP code.
 THIS file reader:
 1. logs you in/out - no database functions, hardcoded autentification
 2. scans the directory content you are in, inspects if it it consists of files or directories, lists them in table
+<<<<<<< HEAD
 3. allows to delete files
 4. allows to upload files
 5. allows to create directories
@@ -22,3 +23,4 @@ Code logic:
 5. irasom duomenis i lentele
 6. kuriam delete mygtuka lenteleje
 7. kuriam back mygtuka aplikacijoje -->
+=======
