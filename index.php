@@ -1,6 +1,51 @@
 <?php
 session_start()
 ?>
+<?php 
+    session_start();
+    // logout logic
+    if(isset($_GET['action']) and $_GET['action'] == 'logout'){
+        session_start();
+        unset($_SESSION['username']);
+        unset($_SESSION['password']);
+        unset($_SESSION['logged_in']);
+        header('Location: login.php');
+        exit;
+    }
+    // file upload logic
+    if(isset($_FILES['any'])){
+        $errors = array();
+
+        $file_name = $_FILES['any']['name'];
+        $file_size = $_FILES['any']['size'];
+        $file_tmp = $_FILES['any']['tmp_name'];
+        $file_type = $_FILES['any']['type'];
+
+        if($file_size > 2097152) {
+            $errors[] = 'File size must be excately 2 MB';
+        }
+        if(empty($errors) == true) {
+            move_uploaded_file($file_tmp, "./" . $path . $file_name);
+            echo "Success";
+        } else {
+            print_r($errors);
+        }
+    }
+    else {
+        print('Please choose the file to upload');
+    }
+    
+// file delete logic
+// if (isset($_POST['delete'])) {
+//     unlink($_GET['path'] . $_POST['delete']);
+//     header('Location: ' . $_SERVER['REQUEST_URI']);
+// } 
+     
+    
+    // file download logic
+
+    // create new directory logic
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,24 +57,8 @@ session_start()
     <title>Folder explorer</title>
 </head>
 <body>
-    <?php
-    // require 'login.php';
-    if($_SESSION['logged_in'] == false){
-     header('location: login.php'); 
-    }
-    // if($_SESSION['logged_in'] == true){
-    //     header('location: index.php'); 
-    //    }
-    ?>
-
-    <!-- 1. nustatom dabartines direktorijos adresa
-    2. Atsisiunciam direktorijos duomenis su GET ir patikrinam ar jie uzsetinti
-    3. Nuskenuojam direktorija i stringa 
-    4. patikrinam kiekviena stringo nari ar tai file ar directory
-    5. irasom duomenis i lentele
-    6. kuriam delete mygtuka lenteleje
-    7. kuriam back mygtuka aplikacijoje -->
     
+    <!-- SCAN DIRECTORY CONTENT -->
     <div>
 <h2>Directory contents getcwd:
     <?php
@@ -56,7 +85,7 @@ session_start()
   
   ?> 
 </h3> 
-
+<!-- SORT DATA INTO TABLE -->
 <table>
     <tr>
         <th>Type</th>
@@ -64,17 +93,26 @@ session_start()
         <th>Action</th>
     </tr>
     <?php 
+     $fileButtons = '<form action="" method="POST">
+     <button type="submit" name="delete" value="' . $dirArray . '">Delete</button>
+ </form>
+ <form action="" method="POST">
+     <button type="submit" name="download" value="' . $dirArray . '">Download</button>
+ </form>';   
     foreach ($dirArray as $name) { //5. irasom duomenis i lentele
           // print($name);
           if (is_file($path . $name)) {
             print('<tr>
                     <td>File</td>
                     <td>' . $name . '</td>
-                    <td><button class = delete>Delete</button>
-                    <button class = upload>Upload</button></td>
+                    <td> <form action="" method="POST">
+                            <button type="submit" name="delete" value="' . $dirArray . '" style="float: left;">Delete</button>
+                        </form>
+                        <form action="" method="POST">
+                             <button type="submit" name="download" value="' . $dirArray . '" style="float: left;">Download</button>
+                        </form> </td>
                   </tr>');
                   
-                    
           } elseif (is_dir($path . $name)) { // SUGALVOTI: kol yra direktorija, tol skenuoti
             print("<tr>
                   <td>Directory</td>
@@ -84,36 +122,38 @@ session_start()
          print_r($myfiles);
           }
         }
-        
+  $fileButtons = '<form action="" method="POST">
+                <button type="submit" name="delete" value="' . $dirArray . '">Delete</button>
+            </form>
+            <form action="" method="POST">
+                <button type="submit" name="download" value="' . $dirArray . '">Download</button>
+            </form>';      
         ?>  
- </table>
+ </table><br>
 
- <!--Upload file  -->
- <?php 
-    print('<pre>');
-    print_r($_FILES['image']);
-    print_r($_FILES['image']['name']);
-    print('</pre>');
-
-    if(isset($_FILES['image'])){
-        $file_name = $_FILES['image']['name'];
-        $file_size = $_FILES['image']['size'];
-        $file_tmp = $_FILES['image']['tmp_name'];
-        $file_type = $_FILES['image']['type'];
-        move_uploaded_file($file_tmp, "./" . $file_name);
-        echo "Success";
-    }
-?>
-<!-- //nurodyti, kur uploadina failus, kokio tipo -->
- <form action="" method="POST" enctype="multipart/form-data"> 
-         <input type="file" name="image" />
+ <!--UPLOAD FILE -->
+  <div><form action="" method="POST" enctype="multipart/form-data"> 
+         <input type="file" name="any"/>
          <input type="submit"/>
       </form>
-<!-- BACK -->
-    <button class="back"> BACK </button>
-    <!-- LOGOUT BTN -->
+    </div>
+<!-- DOWNLOAD FILE -->
 
-    Click here to <a href = "index.php?action=logout"> logout.
+<!-- CREATE DIRECTORIES -->
+<div><form action="" method="POST" enctype="multipart/form-data"> 
+    <input type="text" name="new_dir" placeholder="Type new directory name" required autofocus>
+    <input type="submit">
+</form>
+</div>
+<!-- DELETE -->
+
+<!-- BACK -->
+    <div><button class="back"> BACK </button></div>
+
+
+<!-- LOGOUT BTN -->
+
+<h4>Click here to <a href = "index.php?action=logout"> logout.</h4>
 </div>
 </body>
 </html> 
