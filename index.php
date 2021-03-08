@@ -22,13 +22,14 @@ session_start()
         $file_type = $_FILES['any']['type'];
 
         if($file_size > 2097152) {
-            $errors[] = 'File size must be excately 2 MB';
+            $errors[] = 'File size must be not more than 2 MB';
         }
         if(empty($errors) == true) {
             move_uploaded_file($file_tmp, "./" . $path . $file_name);
             echo "Success";
         } else {
             print_r($errors);
+            unset ($errors);
         }
     }
     else {
@@ -36,15 +37,28 @@ session_start()
     }
     
 // file delete logic
-// if (isset($_POST['delete'])) {
-//     unlink($_GET['path'] . $_POST['delete']);
-//     header('Location: ' . $_SERVER['REQUEST_URI']);
-// } 
+
+
+if (isset($_POST['delete'])) {
+    unlink ($_GET['path'] . $_POST['delete']);
+}
+
      
     
     // file download logic
 
     // create new directory logic
+
+    if (isset($_POST['new_dir'])) {
+        if (file_exists($_POST['new_dir']) && is_dir($_POST['new_dir'])) {
+        $dirError[] = 'The directory with this name already exists';
+        print($dirError);
+        // unset ($new_dir);
+        // unset ($dirError);
+        } else {
+        mkdir($_GET['path'] . $_POST['new_dir']);
+    }
+    };
 ?>
 
 <!DOCTYPE html>
@@ -80,8 +94,8 @@ session_start()
                                              //2. Atsisiunciam direktorijos duomenis su GET
   $myfiles = scandir('./' . $_GET['path']); //3. Nuskenuojam direktorija i stringa 
   print_r($myfiles); 
-  $dirArray = array_values(array_diff($myfiles, array('..', '.'))); //3.1 isvalom taskiukus ir atstatom indeksus nuo nulio
-  print_r($dirArray); 
+//   $dirArray = array_values(array_diff($myfiles, array('..', '.'))); //3.1 isvalom taskiukus ir atstatom indeksus nuo nulio
+//   print_r($dirArray); 
   
   ?> 
 </h3> 
@@ -93,42 +107,106 @@ session_start()
         <th>Action</th>
     </tr>
     <?php 
-     $fileButtons = '<form action="" method="POST">
-     <button type="submit" name="delete" value="' . $dirArray . '">Delete</button>
- </form>
- <form action="" method="POST">
-     <button type="submit" name="download" value="' . $dirArray . '">Download</button>
- </form>';   
-    foreach ($dirArray as $name) { //5. irasom duomenis i lentele
-          // print($name);
-          if (is_file($path . $name)) {
-            print('<tr>
-                    <td>File</td>
-                    <td>' . $name . '</td>
-                    <td> <form action="" method="POST">
-                            <button type="submit" name="delete" value="' . $dirArray . '" style="float: left;">Delete</button>
-                        </form>
-                        <form action="" method="POST">
-                             <button type="submit" name="download" value="' . $dirArray . '" style="float: left;">Download</button>
-                        </form> </td>
-                  </tr>');
-                  
-          } elseif (is_dir($path . $name)) { // SUGALVOTI: kol yra direktorija, tol skenuoti
-            print("<tr>
-                  <td>Directory</td>
-                  <td><a href=('$dirArray . $name'))>$name</a></td>
-                  <td></td>
-            </tr>");
-         print_r($myfiles);
-          }
+     for ($i = 0; $i < count($myfiles); $i++) {
+        if ($myfiles[$i] === '.' || $myfiles[$i] === '..') continue;
+        if (is_file($path . $myfiles[$i])) 
+            {print('<tr>
+                        <td>File</td>
+                        <td>' . $myfiles[$i] . '</td>
+                        <td>
+                            <form action="" method="POST">
+                                <button type="submit" name="delete" value="' . $myfiles[$i] . '" onclick="return confirm(\'Are you sure?\')">Delete</button>
+                            </form>
+                                <form action="" method="POST">
+                            <button type="submit" name="download" value="' . $myfiles[$i] . '">Download</button>
+                            </form>
+                        </td>
+                </tr>');}
+        if (is_dir($path . $myfiles[$i])) {
+            if (!isset($_GET['path'])) {
+                print('<tr>
+                        <td>Directory</td>
+                        <td>
+                        <a href="' . $_SERVER['REQUEST_URI'] . '?path=' . $myfiles[$i] . '/">' . $myfiles[$i] . '</a>
+                        </td>
+                        <td></td>
+                    </tr>');
+            } else {
+                print('<tr>
+                        <td>Directory</td>
+                        <td>
+                        <a href="' . $_SERVER['REQUEST_URI'] . $myfiles[$i] . '/">' . $myfiles[$i] . '</a>
+                        </td>
+                        <td></td>
+                     </tr>');
+                }
+            }
         }
-  $fileButtons = '<form action="" method="POST">
-                <button type="submit" name="delete" value="' . $dirArray . '">Delete</button>
-            </form>
-            <form action="" method="POST">
-                <button type="submit" name="download" value="' . $dirArray . '">Download</button>
-            </form>';      
-        ?>  
+
+
+//         <?php
+// function dirToArray($dir) {
+  
+//    $result = array();
+
+//    $cdir = scandir($dir);
+//    foreach ($cdir as $key => $value)
+//    {
+//       if (!in_array($value,array(".","..")))
+//       {
+//          if (is_dir($dir . DIRECTORY_SEPARATOR . $value))
+//          {
+//             $result[$value] = dirToArray($dir . DIRECTORY_SEPARATOR . $value);
+//          }
+//          else
+//          {
+//             $result[] = $value;
+//          }
+//       }
+//    }
+  
+//    return $result;
+// } ?>
+//      $fileButtons = '<form action="" method="POST">
+//      <button type="submit" name="delete" value="' . $dirArray . '">Delete</button>
+//  </form>
+//  <form action="" method="POST">
+//      <button type="submit" name="download" value="' . $dirArray . '">Download</button>
+//  </form>';   
+//     foreach ($dirArray as $name) { //5. irasom duomenis i lentele
+//           // print($name);
+//           if (is_file($path . $name)) {
+//             print('<tr>
+//                     <td>File</td>
+//                     <td>' . $name . '</td>
+//                     <td> <form action="" method="POST">
+//                             <button type="submit" name="delete" value="' . $dirArray . '" style="float: left;">Delete</button>
+//                         </form>
+//                         <form action="" method="POST">
+//                              <button type="submit" name="download" value="' . $dirArray . '" style="float: left;">Download</button>
+//                         </form> </td>
+//                   </tr>');
+                  
+//           } elseif (is_dir($path . $name)) { // SUGALVOTI: kol yra direktorija, tol skenuoti
+//             print("<tr>
+//                   <td>Directory</td>
+//                   <td><a href=('$dirArray . $name'))>$name</a></td>
+//                   <td></td>
+//             </tr>");
+//          print_r($myfiles);
+//           }
+//         }
+
+        // <form action="" method="POST">
+        //                                                         <button type="submit" name="delete" value="' . $content[$i] . '" onclick="return confirm(\'Are you sure?\')">Delete</button>
+        //                                                     </form>
+//   $fileButtons = '<form action="" method="POST">
+//                 <button type="submit" name="delete" value="' . $dirArray . '">Delete</button>
+//             </form>
+//             <form action="" method="POST">
+//                 <button type="submit" name="download" value="' . $dirArray . '">Download</button>
+//             </form>';      
+//         ?>  
  </table><br>
 
  <!--UPLOAD FILE -->
@@ -142,10 +220,17 @@ session_start()
 <!-- CREATE DIRECTORIES -->
 <div><form action="" method="POST" enctype="multipart/form-data"> 
     <input type="text" name="new_dir" placeholder="Type new directory name" required autofocus>
+    <!-- <span><?php if(isset($_POST['new_dir']) && ($dirError) == true) 
+                print_r ($dirError)?>
+    </span> -->
     <input type="submit">
+
+   
 </form>
 </div>
 <!-- DELETE -->
+
+
 
 <!-- BACK -->
     <div><button class="back"> BACK </button></div>
