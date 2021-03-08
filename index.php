@@ -32,18 +32,16 @@ session_start()
         }
     }
        
-    // file delete logic
+// file delete logic
 
     if (isset($_POST['delete'])) {
     unlink ($_GET['path'] . $_POST['delete']);
     }
 
     
-    // file download logic
+// file download logic
     if(isset($_POST['download'])){
-        // print('Path to download: ' . './' . $_GET["path"] . $_POST['download']);
         $file='./' . $_POST['download'];
-        // a&nbsp;b.txt --> a b.txt
         $fileToDownloadEscaped = str_replace("&nbsp;", " ", htmlentities($file, null, 'utf-8'));
 
         ob_clean();
@@ -62,15 +60,15 @@ session_start()
         exit;
     }
 
-    // create new directory logic
-    $dirError = array();
-    if (isset($_POST['new_dir'])) {
-        if (file_exists($_POST['new_dir']) && is_dir($_POST['new_dir'])) {
-      break;
-        }else {
+// create new directory logic
+    if ((isset($_POST['new_dir'])) && (!file_exists($_POST['new_dir'])) && (!is_dir($_POST['new_dir']))){
         mkdir($_GET['path'] . $_POST['new_dir']);
-    }
     };
+//back button logic
+    $previous = "javascript:history.go(-1)";
+    if(isset($_SERVER['HTTP_REFERER'])) {
+    $previous = $_SERVER['HTTP_REFERER'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -85,29 +83,18 @@ session_start()
 <body>
     
     <!-- SCAN DIRECTORY CONTENT -->
-    <div>
-<h2>Directory contents getcwd:
+    
+<h2>Directory contents:
     <?php
     $cur_dir = getcwd(); 
     echo $cur_dir ;  
-       
-    ?>
+     ?>
 </h2> 
-<h3>SERVER request uri:
-    <?php
-    print($_SERVER['REQUEST_URI']); //1. nustatom dabartines direktorijos adresa
-    print('GET path: '. '/'.$_GET['path']);     
-    ?>
-</h3> 
 
-<h3>
- SCANDIR:
-  <?php 
-                                             //2. Atsisiunciam direktorijos duomenis su GET
-  $myfiles = scandir('./' . $_GET['path']); //3. Nuskenuojam direktorija i stringa 
-  print_r($myfiles); 
-  ?> 
-</h3> 
+<?php 
+   $myfiles = scandir('./' . $_GET['path']);
+?> 
+
 <!-- SORT DATA INTO TABLE -->
 <table>
     <tr>
@@ -124,10 +111,10 @@ session_start()
                         <td>' . $myfiles[$i] . '</td>
                         <td>
                             <form action="" method="POST">
-                                <button type="submit" name="delete" value="' . $myfiles[$i] . '" onclick="return confirm(\'Delete?\')">Delete</button>
+                                <button type="submit" name="delete" value="' . $myfiles[$i] . '" onclick="return confirm(\'Delete?\')" style="float: left;">Delete</button>
                             </form>
                                 <form action="" method="POST">
-                            <button type="submit" name="download" value="' . $myfiles[$i] . '">Download</button>
+                            <button type="submit" name="download" value="' . $myfiles[$i] . '" style="float: left;">Download</button>
                             </form>
                         </td>
                 </tr>');}
@@ -168,13 +155,13 @@ session_start()
 <br>
 
 <!-- BACK -->
-    <div><button class="back"> BACK </button></div>
+    <div><button class="back"> <a href="<?= $previous ?>">Back</a> </button></div>
 
-
+    
 <!-- LOGOUT BTN -->
 
 <h4>Click here to <a href = "index.php?action=logout"> logout.</h4>
-</div>
+
 </body>
 </html> 
 
