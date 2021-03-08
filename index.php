@@ -120,16 +120,19 @@ session_start()
                 </tr>');}
         if (is_dir($path . $myfiles[$i])) {
             $myfiles = scandir('./' . $_GET['path']);
-               print('<tr>
+                print('<tr>
                         <td>Directory</td>
                         <td>
                         <a href="' . $_SERVER['REQUEST_URI'] . $myfiles[$i] . '/">' . $myfiles[$i] . '</a>
                         </td>
                         <td></td>
                      </tr>');
-                }
-            }
+            }                  
+                
+        }
       ?>  
+
+
  </table><br>
 
  <!--UPLOAD FILE -->

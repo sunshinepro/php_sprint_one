@@ -20,13 +20,3 @@ tr:nth-child(even) {
 tr:nth-child(odd) {
     background-color: #fff;
   }
-/* .back, .delete, .upload {
-    margin: 20px 0 0 30px;
-    padding: 10px 20px;
-    border: 1px solid black;
-    font-size: 20px;
-    width: 150px;
-    background-color: rgb(201, 230, 201);
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-      
-} */
